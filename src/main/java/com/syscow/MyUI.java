@@ -45,19 +45,32 @@ public class MyUI extends UI {
                         new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
                 collectedWords.setWidth("600");
                 layout.addComponent(collectedWords);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
+
+        Button buttonReadLinsToo = new Button("Read Links Too");
+        buttonReadLinsToo.addClickListener(e -> {
+            try {
+                OpenReader dictionary = new OpenReader(link.getValue(), Integer.valueOf(words.getValue()));
+                TextArea collectedWords =
+                        new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
+                collectedWords.setWidth("600");
+                layout.addComponent(collectedWords);
 
                 dictionary.getLinks().forEach(alink -> {
-                            try {
-                                OpenReader newDictionary = new OpenReader(alink, Integer.valueOf(words.getValue()));
-                                TextArea newCollectedWords =
-                                        new TextArea(alink, newDictionary.createDictionary());
-                                collectedWords.setWidth("600");
-                                layout.addComponent(newCollectedWords);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
+                    try {
+                        OpenReader newDictionary = new OpenReader(alink, Integer.valueOf(words.getValue()));
+                        TextArea newCollectedWords =
+                                new TextArea(alink, newDictionary.createDictionary());
+                        collectedWords.setWidth("600");
+                        layout.addComponent(newCollectedWords);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
 
-                            }
-                        });
+                    }
+                });
 
             } catch (IOException e1) {
                 e1.printStackTrace();
