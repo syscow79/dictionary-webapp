@@ -7,12 +7,11 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import dictionary.OpenReader;
+import dictionary.LinkReader;
 
 import java.io.IOException;
 
@@ -40,7 +39,7 @@ public class MyUI extends UI {
         Button button = new Button("Click Me");
         button.addClickListener(e -> {
             try {
-                OpenReader dictionary = new OpenReader(link.getValue(), Integer.valueOf(words.getValue()));
+                LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
                 TextArea collectedWords =
                         new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
                 collectedWords.setWidth("600");
@@ -53,7 +52,7 @@ public class MyUI extends UI {
         Button buttonReadLinsToo = new Button("Read Links Too");
         buttonReadLinsToo.addClickListener(e -> {
             try {
-                OpenReader dictionary = new OpenReader(link.getValue(), Integer.valueOf(words.getValue()));
+                LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
                 TextArea collectedWords =
                         new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
                 collectedWords.setWidth("600");
@@ -61,7 +60,7 @@ public class MyUI extends UI {
 
                 dictionary.getLinks().forEach(alink -> {
                     try {
-                        OpenReader newDictionary = new OpenReader(alink, Integer.valueOf(words.getValue()));
+                        LinkReader newDictionary = new LinkReader(alink, Integer.valueOf(words.getValue()));
                         TextArea newCollectedWords =
                                 new TextArea(alink, newDictionary.createDictionary());
                         collectedWords.setWidth("600");

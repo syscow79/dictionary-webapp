@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-public class OpenReader {
+public class LinkReader {
 
 	private Integer words = 1;
 	private Reader reader;
@@ -38,14 +38,14 @@ public class OpenReader {
 	private String sourceAsText;
 
 	public static void main(String[] args) throws IOException {
-		new OpenReader("https://teacherluke.co.uk/archive-of-episodes-1-149/", 1);
+		new LinkReader("https://teacherluke.co.uk/archive-of-episodes-1-149/", 1);
 	}
 
-	public OpenReader() throws IOException {
+	public LinkReader() throws IOException {
 		setReader(new FileReader("src/main/resources/com_maven_maven_overview.htm"));
 	}
 
-	public OpenReader(String url, Integer words) throws IOException {
+	public LinkReader(String url, Integer words) throws IOException {
 		long startTime = System.currentTimeMillis();
 		this.words = words;
 		setUrlAndHost(url);
@@ -175,7 +175,7 @@ public class OpenReader {
 	}
 
 	private List<String> readWordsFromText(String line) {
-		line = line.replaceAll("[,:;(){}=*/@]", " ");
+		line = line.replaceAll("[,:;(){}=*/@\\-]", " ");
 		line = line.replaceAll("\\s+", " ");
 		line = line.replaceAll("\\s", " ");
 		line = line.replaceAll(" +", " ");
