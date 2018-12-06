@@ -35,7 +35,7 @@ public class MyUI extends UI {
         link.setWidth("600");
 
         final TextField words = new TextField();
-        words.setCaption("Source link");
+        words.setCaption("Word");
 
         Button button = new Button("Click Me");
         button.addClickListener(e -> {
@@ -45,6 +45,20 @@ public class MyUI extends UI {
                         new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
                 collectedWords.setWidth("600");
                 layout.addComponent(collectedWords);
+
+                dictionary.getLinks().forEach(alink -> {
+                            try {
+                                OpenReader newDictionary = new OpenReader(alink, Integer.valueOf(words.getValue()));
+                                TextArea newCollectedWords =
+                                        new TextArea(alink, newDictionary.createDictionary());
+                                collectedWords.setWidth("600");
+                                layout.addComponent(newCollectedWords);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+
+                            }
+                        });
+
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

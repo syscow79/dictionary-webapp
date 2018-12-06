@@ -38,7 +38,7 @@ public class OpenReader {
 	private String sourceAsText;
 
 	public static void main(String[] args) throws IOException {
-		new OpenReader("https://cwe.mitre.org/data/definitions/607.html", 1);
+		new OpenReader("https://teacherluke.co.uk/archive-of-episodes-1-149/", 1);
 	}
 
 	public OpenReader() throws IOException {
@@ -57,7 +57,7 @@ public class OpenReader {
 		collectedDictionary = createDictionary();
 
 		System.out.println("Links: ");
-		getLinks().forEach(link -> System.out.println(host + link));
+		getLinks().forEach(System.out::println);
 
 		// System.out.println(collectedDictionary);
 
@@ -146,7 +146,7 @@ public class OpenReader {
 		return Jsoup.parse(Jsoup.parse(html).text()).text();
 	}
 
-	public Set<String> getLinks() {
+	public Set<String> getInnerLinks() {
 		Document doc = Jsoup.parse(source);
 		Elements links = doc.select("a[href]");
 		Set<String> linkSet = new HashSet<>();
@@ -159,6 +159,17 @@ public class OpenReader {
 				}
 				linkSet.add(linkhref);
 			}
+		}
+		return linkSet;
+	}
+
+	public Set<String> getLinks() {
+		Document doc = Jsoup.parse(source);
+		Elements links = doc.select("a[href]");
+		Set<String> linkSet = new HashSet<>();
+		for (Element link : links) {
+			String linkhref = link.attr("href");
+				linkSet.add(linkhref);
 		}
 		return linkSet;
 	}
