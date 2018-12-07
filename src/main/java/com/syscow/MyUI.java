@@ -7,6 +7,7 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -14,6 +15,8 @@ import com.vaadin.ui.VerticalLayout;
 import dictionary.LinkReader;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window
@@ -24,6 +27,8 @@ import java.io.IOException;
  */
 @Theme("mytheme")
 public class MyUI extends UI {
+
+    private List<LinkReader> linkReaders = new ArrayList<>();
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -38,43 +43,36 @@ public class MyUI extends UI {
 
         Button button = new Button("Click Me");
         button.addClickListener(e -> {
-            try {
-                LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
-                TextArea collectedWords =
-                        new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
-                collectedWords.setWidth("600");
-                layout.addComponent(collectedWords);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
+
+            TextArea collectedWords =
+                    new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
+            collectedWords.setWidth("600");
+
+            LinkReader newWordsDictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()),
+                    linkReaders);
+            TextArea collectedNewWords = new TextArea("new words", newWordsDictionary.createNewWordsDictionary());
+            collectedNewWords.setWidth("600");
+            layout.addComponent(new HorizontalLayout(collectedWords, collectedNewWords));
+            linkReaders.add(dictionary);
         });
 
-        Button buttonReadLinsToo = new Button("Read Links Too");
-        buttonReadLinsToo.addClickListener(e -> {
-            try {
-                LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
-                TextArea collectedWords =
-                        new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
-                collectedWords.setWidth("600");
-                layout.addComponent(collectedWords);
-
-                dictionary.getLinks().forEach(alink -> {
-                    try {
-                        LinkReader newDictionary = new LinkReader(alink, Integer.valueOf(words.getValue()));
-                        TextArea newCollectedWords =
-                                new TextArea(alink, newDictionary.createDictionary());
-                        collectedWords.setWidth("600");
-                        layout.addComponent(newCollectedWords);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-
-                    }
-                });
-
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        });
+        // Button buttonReadLinsToo = new Button("Read Links Too");
+        // buttonReadLinsToo.addClickListener(e -> {
+        //     LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
+        //     TextArea collectedWords =
+        //             new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
+        //     collectedWords.setWidth("600");
+        //     layout.addComponent(collectedWords);
+        //
+        //     dictionary.getLinks().forEach(alink -> {
+        //         LinkReader newDictionary = new LinkReader(alink, Integer.valueOf(words.getValue()));
+        //         TextArea newCollectedWords =
+        //                 new TextArea(alink, newDictionary.createDictionary());
+        //         collectedWords.setWidth("600");
+        //         layout.addComponent(newCollectedWords);
+        //     });
+        // });
 
         layout.addComponents(link, words, button);
 

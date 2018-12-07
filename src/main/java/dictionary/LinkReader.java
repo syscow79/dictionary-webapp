@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 public class LinkReader {
 
+	private List<LinkReader> oldReaders = null;
 	private Integer words = 1;
 	private Reader reader;
 	private URL url;
@@ -37,19 +38,19 @@ public class LinkReader {
 	private String collectedDictionary;
 	private String sourceAsText;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args){
 		new LinkReader("https://teacherluke.co.uk/archive-of-episodes-1-149/", 1);
 	}
 
 	public LinkReader() throws IOException {
-		setReader(new FileReader("src/main/resources/com_maven_maven_overview.htm"));
+		// setReader(new FileReader("src/main/resources/com_maven_maven_overview.htm"));
 	}
 
-	public LinkReader(String url, Integer words) throws IOException {
+	public LinkReader(String url, Integer words){
 		long startTime = System.currentTimeMillis();
 		this.words = words;
 		setUrlAndHost(url);
-		setReader(new InputStreamReader(this.url.openStream()));
+		setReader();
 		setSource();
 		setSourceAsText();
 		setWordMap();
@@ -66,6 +67,11 @@ public class LinkReader {
 		System.out.println("Time: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 
+	public LinkReader(String url, Integer words, List<LinkReader> oldReaders){
+		this(url, words);
+		this.oldReaders = oldReaders;
+	}
+
 	private void setSourceAsText() {
 		sourceAsText = html2text(source);
 	}
@@ -78,10 +84,14 @@ public class LinkReader {
 		source = readAllText();
 	}
 
-	private void setUrlAndHost(String url) throws MalformedURLException {
+	private void setUrlAndHost(String url) {
 		System.out.println(url);
-		this.url = new URL(url);
-		host = this.url.getHost();
+		try {
+			this.url = new URL(url);
+			host = this.url.getHost();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void setSortedWordMap() {
@@ -91,16 +101,32 @@ public class LinkReader {
 	}
 
 	public String createDictionary() {
-		keySet = new LinkedHashSet<>(sortedWordMap.keySet());
+		keySet = new LinkedHashSet<>(getSortedWordMapKeySet());
 		totalCount = 0;
 		String dictionary = "";
 		for (String word : keySet) {
 			totalCount += wordMap.get(word);
-			//System.out.println(word + " : " + wordMap.get(word));
-			// System.out.println(word);
 			dictionary += word + " : " + wordMap.get(word) + "\n";
 		}
 		return dictionary;
+	}
+
+	public String createNewWordsDictionary() {
+		Set<String> newKeySet = new LinkedHashSet<>(getSortedWordMapKeySet());
+		String dictionary = "";
+		for (String word : newKeySet) {
+			if (oldReaders.stream()
+					.filter(oldReader -> oldReader.getSortedWordMapKeySet().stream()
+							.anyMatch(oldWord -> oldWord.equals(word)))
+			.count() == 0) {
+				dictionary += word + " : " + wordMap.get(word) + "\n";
+			}
+		}
+		return dictionary;
+	}
+
+	private Set<String> getSortedWordMapKeySet() {
+		return sortedWordMap.keySet();
 	}
 
 	private int getTotalCount() {
@@ -198,8 +224,12 @@ public class LinkReader {
 		return reader;
 	}
 
-	public void setReader(Reader reader) {
-		this.reader = reader;
+	public void setReader() {
+		try {
+			this.reader = new InputStreamReader(url.openStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
