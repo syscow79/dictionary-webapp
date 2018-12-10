@@ -155,11 +155,17 @@ public class LinkReader {
 	}
 
 	private String readAllText() {
+		long startTime = System.currentTimeMillis();
 		String line, source = "";
+
 		try (BufferedReader br = new BufferedReader(getReader())) {
 			while ((line = br.readLine()) != null) {
 				source += line + "\n";
+				if (source.length() > 2_000_000 || (System.currentTimeMillis() - startTime) > 3000) {
+					getReader().close();
+				}
 			}
+			getReader().close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

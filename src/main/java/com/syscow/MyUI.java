@@ -14,7 +14,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import dictionary.LinkReader;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,40 +42,36 @@ public class MyUI extends UI {
 
         Button button = new Button("Click Me");
         button.addClickListener(e -> {
-            LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
-
-            TextArea collectedWords =
-                    new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
-            collectedWords.setWidth("600");
-
-            LinkReader newWordsDictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()),
-                    linkReaders);
-            TextArea collectedNewWords = new TextArea("new words", newWordsDictionary.createNewWordsDictionary());
-            collectedNewWords.setWidth("600");
-            layout.addComponent(new HorizontalLayout(collectedWords, collectedNewWords));
-            linkReaders.add(dictionary);
+            readLinkAndAddToLayout(layout, link.getValue(), words.getValue());
         });
 
-        // Button buttonReadLinsToo = new Button("Read Links Too");
-        // buttonReadLinsToo.addClickListener(e -> {
-        //     LinkReader dictionary = new LinkReader(link.getValue(), Integer.valueOf(words.getValue()));
-        //     TextArea collectedWords =
-        //             new TextArea("Collected words: " + link.getValue(), dictionary.createDictionary());
-        //     collectedWords.setWidth("600");
-        //     layout.addComponent(collectedWords);
-        //
-        //     dictionary.getLinks().forEach(alink -> {
-        //         LinkReader newDictionary = new LinkReader(alink, Integer.valueOf(words.getValue()));
-        //         TextArea newCollectedWords =
-        //                 new TextArea(alink, newDictionary.createDictionary());
-        //         collectedWords.setWidth("600");
-        //         layout.addComponent(newCollectedWords);
-        //     });
-        // });
+        Button buttonReadLinsToo = new Button("Read Links Too");
+        buttonReadLinsToo.addClickListener(e -> {
+            LinkReader dictionary = readLinkAndAddToLayout(layout,  link.getValue(), words.getValue());
+            dictionary.getLinks().forEach(alink -> {
+                readLinkAndAddToLayout(layout, alink, words.getValue());
+            });
+        });
 
-        layout.addComponents(link, words, button);
+        layout.addComponents(link, words, button, buttonReadLinsToo);
 
         setContent(layout);
+    }
+
+    private LinkReader readLinkAndAddToLayout(VerticalLayout layout, String link, String words) {
+        LinkReader dictionary = new LinkReader(link, Integer.valueOf(words));
+
+        TextArea collectedWords =
+                new TextArea("Collected words: " + link, dictionary.createDictionary());
+        collectedWords.setWidth("600");
+
+        LinkReader newWordsDictionary = new LinkReader(link, Integer.valueOf(words), linkReaders);
+        TextArea collectedNewWords = new TextArea("new words", newWordsDictionary.createNewWordsDictionary());
+        collectedNewWords.setWidth("600");
+        layout.addComponent(new HorizontalLayout(collectedWords, collectedNewWords));
+        linkReaders.add(dictionary);
+
+        return dictionary;
     }
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
